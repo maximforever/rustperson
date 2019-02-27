@@ -1,0 +1,10 @@
+[package]
+name = "rustman"
+version = "0.1.0"
+authors = ["maximforever <flufci@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.2.10"
+rand = "0.6"
+unicode-width = "*"
