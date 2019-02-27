@@ -1,12 +1,36 @@
-use std::iter;
-use structopt::StructOpt;
+use std::{iter, io::{stdin, stdout, Write}};
 
 use rand::Rng;
 
 const WORD_BANK: [&str; 5] = ["enumerable", "rust", "collection", "borrowing", "iterator" ];
 const MAX_GUESSES: u8 = 10;
 
+fn turn(letters_already_guessed: &mut Vec<char>, answer: &str) {
+	println!("Please guess your next letter.");
+	let mut s = String::new();
+	stdin().read_line(&mut s); // read in user input string
+	s = s.trim().to_string();
+
+    if s.len() != 1 {
+    	println!("Please only enter one alphabetical character.");
+    } else {
+    	let c = s.pop().unwrap();
+    	// TODO: if characters are not in the Latin alphabet
+    	if !c.is_alphabetic() {
+    		println!("Please enter an alphabetical character.");
+    	} else {
+    		letters_already_guessed.push(c);
+
+    		let gameboard = display_gameboard(answer, &letters_already_guessed);
+            println!("Gameboard: {}", gameboard);
+    	}
+    }
+    
+    turn(letters_already_guessed, answer);
+}
+
 fn main() {
+    
 
     println!("Rustman is a game where the robot gets more and more rusty as you guess letters");
 
@@ -28,13 +52,15 @@ fn main() {
     
 	// the vec! can be used to initialize strings
     let answer = rand::thread_rng().choose(&WORD_BANK).unwrap();	
-    let mut letters_already_guessed: Vec<char> = vec!['e', 'a', 'l', 'o']; 
+    let mut letters_already_guessed: Vec<char> = vec![]; 
 
     println!("Vector: {:?}", WORD_BANK);
     println!("Answer: {}", answer);
 
     let gameboard = display_gameboard(answer, &letters_already_guessed);
     println!("Gameboard: {}", gameboard);
+
+    turn(&mut letters_already_guessed, answer);
 }
 
 
