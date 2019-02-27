@@ -1,78 +1,92 @@
-use std::{iter, io::{stdin, stdout, Write}};
+use std::io::stdin;
 
-use rand::Rng;
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 
 const WORD_BANK: [&str; 5] = ["enumerable", "rust", "collection", "borrowing", "iterator" ];
 const MAX_GUESSES: u8 = 10;
 
-fn turn(letters_already_guessed: &mut Vec<char>, answer: &str) {
-	println!("Please guess your next letter.");
-	let mut s = String::new();
-	stdin().read_line(&mut s); // read in user input string
-	s = s.trim().to_string();
 
-    if s.len() != 1 {
-    	println!("Please only enter one alphabetical character.");
-    } else {
-    	let c = s.pop().unwrap();
-    	// TODO: if characters are not in the Latin alphabet
-    	if !c.is_alphabetic() {
-    		println!("Please enter an alphabetical character.");
-    	} else {
-    		letters_already_guessed.push(c);
+struct Game {
+	answer: String,
+	letters_guessed: Vec<char>
+}
 
-    		let gameboard = display_gameboard(answer, &letters_already_guessed);
-            println!("Gameboard: {}", gameboard);
-    	}
-    }
-    
-    turn(letters_already_guessed, answer);
+impl Game {
+	fn setup_new_game(&mut self) {
+		// the vec! can be used to initialize strings
+	    let mut rng = thread_rng();
+	    self.answer = WORD_BANK.choose(&mut rng).unwrap().to_string();	
+	    self.letters_guessed = vec![]; 
+
+	    println!("Vector: {:?}", WORD_BANK);
+    	println!("Answer: {}", self.answer);
+	}
+
+
+	fn display_gameboard(&self) -> String {
+		let mut display_answer = String::new();
+		for c in self.answer.chars() {
+			if self.letters_guessed.contains(&c) {
+				display_answer.push(c);
+			} else {
+				display_answer.push('_');
+			}
+		}
+		display_answer			// implicit return
+	}
+
+
+	fn word_has_been_guessed(&self) -> bool {
+		for c in self.answer.chars() {
+			if !self.letters_guessed.contains(&c) {
+				return false;
+			}
+		}
+		true			// implicit return
+	}
+
+
+	fn take_turn(&mut self) {
+		let gameboard = self.display_gameboard();
+		println!("Gameboard: {}", gameboard);
+
+		println!("Please guess your next letter.");
+		let mut s = String::new();
+		stdin().read_line(&mut s); // read in user input string
+		s = s.trim().to_string();
+
+	    if s.len() != 1 {
+	    	println!("Please only enter one alphabetical character.");
+	    	self.take_turn();
+	    } else {
+	    	let c = s.pop().unwrap();
+	    	// TODO: if characters are not in the Latin alphabet
+	    	if !c.is_alphabetic() {
+	    		println!("Please enter an alphabetical character.");
+	    		self.take_turn();
+	    	} else {
+	    		self.letters_guessed.push(c);
+	    		if self.word_has_been_guessed() {
+	    			println!("You won!");
+	    		} else {
+
+		            self.take_turn();
+	    		}
+	    	}
+	    }
+	}
+
 }
 
 fn main() {
-    
+    let mut g = Game {
+    	answer: String::from(""),
+		letters_guessed: vec![]
+    };
 
-    println!("Rustman is a game where the robot gets more and more rusty as you guess letters");
-
-
-    /*
-    
-    	1. pick random word from array and store it as a constant string
-    	2. have 1 other vector for previously guessed letters
-    	3. on each "turn", check if all the letters of the word have been guessed
-    		check if we've hit the max guess limit
-
-	    		- if NO: display:
-	    			a. word so far
-	    			b. letters you've guessed
-	    		- else "you've won! play again?"
-    		- if yes, reset, run this whole thing again
-
-     */
-    
-	// the vec! can be used to initialize strings
-    let answer = rand::thread_rng().choose(&WORD_BANK).unwrap();	
-    let mut letters_already_guessed: Vec<char> = vec![]; 
-
-    println!("Vector: {:?}", WORD_BANK);
-    println!("Answer: {}", answer);
-
-    let gameboard = display_gameboard(answer, &letters_already_guessed);
-    println!("Gameboard: {}", gameboard);
-
-    turn(&mut letters_already_guessed, answer);
+    g.setup_new_game();
+    g.take_turn();
 }
 
 
-
-fn display_gameboard(answer: &str, letters_already_guessed: &Vec<char>) -> String {
-	let mut display_answer = String::new();
-	for c in answer.chars() {
-		if letters_already_guessed.contains(&c) {
-			display_answer.push(c);
-		} else {
-			display_answer.push('_');
-		}
-	}
-	display_answer
-}
