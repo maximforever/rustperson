@@ -1,14 +1,15 @@
-use std::io::{stdin, Read};
+use std::io::stdin;
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
 const WORD_BANK: [&str; 5] = ["enumerable", "rust", "collection", "borrowing", "iterator"];
-const MAX_GUESSES: u8 = 10;
+const MAX_GUESSES: usize = 5;
 
 struct Game {
     answer: String,
     letters_guessed: Vec<char>,
+    turns_left: usize,
 }
 
 // TODO: think about upper/lower cases
@@ -22,6 +23,7 @@ struct Game {
 // TODO: code review
 // TODO: display previously guessed letters
 // TODO: do you want to play again?
+// TODO: if someone enters a string, error, don't just take the first letter
 
 impl Game {
     fn new() -> Game {
@@ -29,6 +31,7 @@ impl Game {
         Game {
             answer: WORD_BANK.choose(&mut rng).unwrap().to_string(),
             letters_guessed: vec![],
+            turns_left: MAX_GUESSES,
         }
     }
 
@@ -37,6 +40,7 @@ impl Game {
         let mut rng = thread_rng();
         self.answer = WORD_BANK.choose(&mut rng).unwrap().to_string();
         self.letters_guessed = vec![];
+        self.turns_left = MAX_GUESSES;
 
         println!("Vector: {:?}", WORD_BANK);
         println!("Answer: {}", self.answer);
@@ -70,7 +74,7 @@ impl Game {
     fn get_character(&self) -> char {
         let mut buffer = String::new();
         stdin().read_line(&mut buffer).unwrap();
-        let mut c = buffer.to_lowercase().to_string().chars().next().unwrap();
+        let c = buffer.to_lowercase().to_string().chars().next().unwrap();
 
         if self.is_valid(&c) {
             c
@@ -89,22 +93,34 @@ impl Game {
         let c = self.get_character();
         if c == 'y' {
             self.setup_new_game();
+            self.take_turn();
         } else {
             return;
         }
     }
 
     fn take_turn(&mut self) {
-        let gameboard = self.display_gameboard();
-        println!("Gameboard: {}", gameboard);
-
-        println!("Please guess your next letter.");
-        let c = self.get_character();
-        self.letters_guessed.push(c);
-        if self.word_has_been_guessed() {
-            println!("You won!");
+        if self.turns_left == 0 {
+            println!("You ran out of guesses :(");
+            self.end_game();
         } else {
-            self.take_turn();
+            let gameboard = self.display_gameboard();
+
+            println!("Gameboard: {}", gameboard);
+            println!("Guesses left: {}", self.turns_left);
+            println!("Please guess your next letter.");
+
+            let c = self.get_character();
+            self.letters_guessed.push(c);
+            if !self.answer.contains(&c.to_string()) {
+                self.turns_left -= 1;
+            }
+
+            if self.word_has_been_guessed() {
+                println!("You won!");
+            } else {
+                self.take_turn();
+            }
         }
     }
 }
