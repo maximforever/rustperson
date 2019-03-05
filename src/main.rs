@@ -108,10 +108,16 @@ impl Game {
                 gameboard
             );
             println!("Guesses left: {}", self.turns_left);
+            println!("You've already guessed: {:?}", self.letters_guessed);
+
             println!("Please guess your next letter.");
 
             let c = self.get_character();
-            self.letters_guessed.push(c);
+
+            if !self.letters_guessed.contains(&c){
+                self.letters_guessed.push(c);
+            } 
+            
             if !self.answer.contains(&c.to_string()) {
                 self.turns_left -= 1;
             }
