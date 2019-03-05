@@ -136,3 +136,7 @@ fn main() {
     let mut g = Game::new();
     g.take_turn();
 }
+
+/*
+#[cfg(test)]
+mod tests;*/
