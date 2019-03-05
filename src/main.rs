@@ -2,6 +2,7 @@ use std::io::stdin;
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use termion::{clear, cursor};
 
 const WORD_BANK: [&str; 5] = ["enumerable", "rust", "collection", "borrowing", "iterator"];
 const MAX_GUESSES: usize = 5;
@@ -12,8 +13,7 @@ struct Game {
     turns_left: usize,
 }
 
-// TODO: think about upper/lower cases
-// TODO: limit the number of guesses
+// TODO: display previously guessed letters
 // TODO: validate input--if characters are not in the Latin alphabet
 // TODO: flush stdout after each turn
 // TODO: bigger words/from different source (API)
@@ -21,7 +21,6 @@ struct Game {
 // TODO: show gallows
 // TODO: write tests
 // TODO: code review
-// TODO: display previously guessed letters
 // TODO: do you want to play again?
 // TODO: if someone enters a string, error, don't just take the first letter
 
@@ -106,7 +105,12 @@ impl Game {
         } else {
             let gameboard = self.display_gameboard();
 
-            println!("Gameboard: {}", gameboard);
+            println!(
+                "{}{}Gameboard: {}",
+                clear::All,
+                cursor::Goto(1, 1),
+                gameboard
+            );
             println!("Guesses left: {}", self.turns_left);
             println!("Please guess your next letter.");
 
@@ -117,7 +121,8 @@ impl Game {
             }
 
             if self.word_has_been_guessed() {
-                println!("You won!");
+                println!("You won! 🎉");
+                self.end_game();
             } else {
                 self.take_turn();
             }
