@@ -14,15 +14,11 @@ struct Game {
 }
 
 // TODO: display previously guessed letters
-// TODO: validate input--if characters are not in the Latin alphabet
-// TODO: flush stdout after each turn
-// TODO: bigger words/from different source (API)
-// TODO: multiplayer
-// TODO: show gallows
 // TODO: write tests
+
+// TODO: validate input--if characters are not in the Latin alphabet
+// TODO: bigger words/from different source (API)
 // TODO: code review
-// TODO: do you want to play again?
-// TODO: if someone enters a string, error, don't just take the first letter
 
 impl Game {
     fn new() -> Game {
