@@ -1,10 +1,21 @@
 use super::*;
 
 #[test]
-fn test_is_valid_input() {
+fn test_valid_input() {
     let g = Game::new();
 
     assert!(g.is_valid(&'r'));
-
-    assert_eq!(g.is_valid(&'#'), false);
+    assert!(g.is_valid(&'T'));
 }
+
+#[test]
+fn test_invalid_input() {
+    let g = Game::new();
+    assert_eq!(g.is_valid(&'😋'), false);
+    assert_eq!(g.is_valid(&'3'), false);
+    assert_eq!(g.is_valid(&'#'), false);
+    assert_eq!(g.is_valid(&'ن'), false);
+    assert_eq!(g.is_valid(&'¢'), false);
+}
+
+// TODO: dbg macro: like println but prints the expression and what it equals

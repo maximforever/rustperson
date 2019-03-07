@@ -13,10 +13,7 @@ struct Game {
     turns_left: usize,
 }
 
-// TODO: display previously guessed letters
 // TODO: write tests
-
-// TODO: validate input--if characters are not in the Latin alphabet
 // TODO: bigger words/from different source (API)
 // TODO: code review
 
@@ -36,9 +33,6 @@ impl Game {
         self.answer = WORD_BANK.choose(&mut rng).unwrap().to_string();
         self.letters_guessed = vec![];
         self.turns_left = MAX_GUESSES;
-
-        println!("Vector: {:?}", WORD_BANK);
-        println!("Answer: {}", self.answer);
     }
 
     fn display_gameboard(&self) -> String {
@@ -63,14 +57,20 @@ impl Game {
     }
 
     fn is_valid(&self, c: &char) -> bool {
-        c.is_alphabetic()
+        match c {
+            'a'..='z' => true,
+            'A'..='Z' => true,
+            _ => false,
+        }
     }
 
     fn get_character(&self) -> char {
         let mut buffer = String::new();
         stdin().read_line(&mut buffer).unwrap();
-        let c = buffer.to_lowercase().to_string().chars().next().unwrap();
+        let c = buffer.to_lowercase().chars().next().unwrap();
 
+        // TODO: prevent stack overflow (`yes | cargo run`)
+        // Limit number of guesses to 10
         if self.is_valid(&c) {
             c
         } else {
@@ -109,15 +109,14 @@ impl Game {
             );
             println!("Guesses left: {}", self.turns_left);
             println!("You've already guessed: {:?}", self.letters_guessed);
-
             println!("Please guess your next letter.");
 
             let c = self.get_character();
 
-            if !self.letters_guessed.contains(&c){
+            if !self.letters_guessed.contains(&c) {
                 self.letters_guessed.push(c);
-            } 
-            
+            }
+
             if !self.answer.contains(&c.to_string()) {
                 self.turns_left -= 1;
             }
@@ -137,6 +136,5 @@ fn main() {
     g.take_turn();
 }
 
-/*
 #[cfg(test)]
-mod tests;*/
+mod tests;
