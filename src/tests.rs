@@ -17,5 +17,3 @@ fn test_invalid_input() {
     assert_eq!(g.is_valid(&'ن'), false);
     assert_eq!(g.is_valid(&'¢'), false);
 }
-
-// TODO: dbg macro: like println but prints the expression and what it equals

@@ -43,9 +43,6 @@ struct Game {
     turns_left: usize,
 }
 
-// TODO: write tests
-// TODO: code review
-
 impl Game {
     fn new() -> Game {
         let mut rng = thread_rng();
